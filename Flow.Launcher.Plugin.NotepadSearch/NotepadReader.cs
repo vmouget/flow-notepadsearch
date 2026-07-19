@@ -6,9 +6,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.Runtime.Serialization;
-using System.IO;
 
 public class NotepadReader
 {
@@ -48,63 +45,13 @@ public class NotepadReader
     static extern bool EnumChildWindows(IntPtr hwndParent, EnumWindowsProc lpEnumFunc, IntPtr lParam);
 
     // Class to store Notepad window information
-    [DataContract]
     public class NotepadWindow
     {
-        [IgnoreDataMember]
         public IntPtr WindowHandle { get; set; }
-
-        [DataMember(Name = "processId")]
         public uint ProcessId { get; set; }
-
-        [DataMember(Name = "title")]
         public string Title { get; set; }
-
-        [DataMember(Name = "content")]
         public string Content { get; set; }
-
-        [DataMember(Name = "contentLength")]
         public int ContentLength => Content?.Length ?? 0;
-    }
-
-    // Main method exposed to JavaScript
-    public string GetAllNotepadContent()
-    {
-        try
-        {
-            List<NotepadWindow> windows = ScanAllNotepadWindows();
-
-            using (MemoryStream ms = new MemoryStream())
-            {
-                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<NotepadWindow>));
-                serializer.WriteObject(ms, windows);
-                ms.Position = 0;
-                using (StreamReader sr = new StreamReader(ms))
-                {
-                    return sr.ReadToEnd();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            return $"{{\"error\": \"{ex.Message.Replace("\"", "\\\"")}\", \"stackTrace\": \"{ex.StackTrace.Replace("\"", "\\\"")}\"}}";
-        }
-    }
-
-    // Main method
-    public static void Read(string[] args)
-    {
-        try
-        {
-            NotepadReader reader = new NotepadReader();
-            string result = reader.GetAllNotepadContent();
-            Console.WriteLine(result);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-            Environment.Exit(1);
-        }
     }
 
     public List<NotepadWindow> ScanAllNotepadWindows()

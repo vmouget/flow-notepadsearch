@@ -56,16 +56,13 @@ namespace Flow.Launcher.Plugin.NotepadSearch
         public List<Result> Query(Query query)
         {
             NotepadReader reader = new NotepadReader();
-            string jsonContent = reader.GetAllNotepadContent();
             List<Result> results = new List<Result>();
-            
-            _context.API.LogInfo("NotepadSearch", $"Raw content length: {jsonContent?.Length ?? 0}", "");
-            
+
             try
             {
-                var notepadWindows = System.Text.Json.JsonSerializer.Deserialize<List<NotepadWindow>>(jsonContent);
-                
-                _context.API.LogInfo("NotepadSearch", $"Deserialized {notepadWindows?.Count ?? 0} Notepad windows", "");
+                List<NotepadReader.NotepadWindow> notepadWindows = reader.ScanAllNotepadWindows();
+
+                _context.API.LogInfo("NotepadSearch", $"Scanned {notepadWindows?.Count ?? 0} Notepad windows", "");
 
                 if (notepadWindows == null)
                 {
@@ -76,20 +73,20 @@ namespace Flow.Launcher.Plugin.NotepadSearch
                 {
                     foreach (var window in notepadWindows)
                     {
-                        if (string.IsNullOrEmpty(window.title))
+                        if (string.IsNullOrEmpty(window.Title))
                             continue;
                             
                         results.Add(new Result
                         {
-                            Title = window.title,
-                            SubTitle = $"Notepad window (PID: {window.processId}), {window.contentLength} characters",
+                            Title = window.Title,
+                            SubTitle = $"Notepad window (PID: {window.ProcessId}), {window.ContentLength} characters",
                             IcoPath = IconPath,
-                            CopyText = window.content,
+                            CopyText = window.Content,
                             Action = _ =>
                             {
                                 try
                                 {
-                                    FocusNotepadWindow(window.title, window.processId);
+                                    FocusNotepadWindow(window.Title, window.ProcessId);
                                 }
                                 catch (Exception ex)
                                 {
@@ -106,35 +103,35 @@ namespace Flow.Launcher.Plugin.NotepadSearch
                     
                     foreach (var window in notepadWindows)
                     {
-                        if ((string.IsNullOrEmpty(window.content) && string.IsNullOrEmpty(window.title)) || 
-                            window.title == null)
+                        if ((string.IsNullOrEmpty(window.Content) && string.IsNullOrEmpty(window.Title)) || 
+                            window.Title == null)
                             continue;
                             
-                        _context.API.LogInfo("NotepadSearch", $"Checking window '{window.title}' (PID: {window.processId})", "");
+                        _context.API.LogInfo("NotepadSearch", $"Checking window '{window.Title}' (PID: {window.ProcessId})", "");
                             
-                        bool foundInContent = !string.IsNullOrEmpty(window.content) && 
-                                            window.content.Contains(query.Search, StringComparison.OrdinalIgnoreCase);
-                        bool foundInTitle = window.title.Contains(query.Search, StringComparison.OrdinalIgnoreCase);
+                        bool foundInContent = !string.IsNullOrEmpty(window.Content) && 
+                                            window.Content.Contains(query.Search, StringComparison.OrdinalIgnoreCase);
+                        bool foundInTitle = window.Title.Contains(query.Search, StringComparison.OrdinalIgnoreCase);
                         
                         if (foundInContent || foundInTitle)
                         {
                             string matchType = foundInContent && foundInTitle ? "title and content" : 
                                             foundInContent ? "content" : "title";
                             
-                            _context.API.LogInfo("NotepadSearch", $"Match found in {matchType} of window '{window.title}'", "");
+                            _context.API.LogInfo("NotepadSearch", $"Match found in {matchType} of window '{window.Title}'", "");
                             
                             string subtitle;
-                            if (foundInContent && !string.IsNullOrEmpty(window.content))
+                            if (foundInContent && !string.IsNullOrEmpty(window.Content))
                             {
-                                int index = window.content.IndexOf(query.Search, StringComparison.OrdinalIgnoreCase);
+                                int index = window.Content.IndexOf(query.Search, StringComparison.OrdinalIgnoreCase);
                                 int startIndex = Math.Max(0, index - 30);
-                                int length = Math.Min(window.content.Length - startIndex, 60 + query.Search.Length);
-                                string context = window.content.Substring(startIndex, length);
+                                int length = Math.Min(window.Content.Length - startIndex, 60 + query.Search.Length);
+                                string context = window.Content.Substring(startIndex, length);
                                 
                                 context = context.Replace("\r\n", " ").Replace("\n", " ");
                                 
                                 if (startIndex > 0) context = "..." + context;
-                                if (startIndex + length < window.content.Length) context += "...";
+                                if (startIndex + length < window.Content.Length) context += "...";
                                 
                                 subtitle = $"Found in {matchType}: {context}";
                             }
@@ -145,15 +142,15 @@ namespace Flow.Launcher.Plugin.NotepadSearch
                             
                             results.Add(new Result
                             {
-                                Title = window.title,
+                                Title = window.Title,
                                 SubTitle = subtitle,
                                 IcoPath = IconPath,
-                                CopyText = window.content,
+                                CopyText = window.Content,
                                 Action = _ =>
                                 {
                                     try
                                     {
-                                        FocusNotepadWindow(window.title, window.processId);
+                                        FocusNotepadWindow(window.Title, window.ProcessId);
                                     }
                                     catch (Exception ex)
                                     {
@@ -182,21 +179,13 @@ namespace Flow.Launcher.Plugin.NotepadSearch
             return results;
         }
 
-        private class NotepadWindow
-        {
-            public string content { get; set; }
-            public int contentLength { get; set; }
-            public int processId { get; set; }
-            public string title { get; set; }
-        }
-
-        private void FocusNotepadWindow(string title, int processId)
+        private void FocusNotepadWindow(string title, uint processId)
         {
             _context.API.LogInfo("NotepadSearch", $"Attempting to focus window with title '{title}' and PID {processId}", "");
-            
+
             EnumWindows((hWnd, lParam) =>
             {
-                int pid;
+                uint pid;
                 GetWindowThreadProcessId(hWnd, out pid);
                 
                 if (pid == processId)
@@ -230,7 +219,7 @@ namespace Flow.Launcher.Plugin.NotepadSearch
         private static extern bool EnumWindows(EnumWindowsProc enumProc, int lParam);
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]
-        private static extern int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
+        private static extern int GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern bool IsIconic(IntPtr hWnd);
