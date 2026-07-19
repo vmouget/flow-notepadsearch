@@ -66,15 +66,12 @@ namespace Flow.Launcher.Plugin.NotepadSearch
                 var notepadWindows = System.Text.Json.JsonSerializer.Deserialize<List<NotepadWindow>>(jsonContent);
                 
                 _context.API.LogInfo("NotepadSearch", $"Deserialized {notepadWindows?.Count ?? 0} Notepad windows", "");
-                
-                if (notepadWindows.Count > 1 && 
-                    notepadWindows[0].contentLength > 0 && 
-                    notepadWindows[0].contentLength > notepadWindows.Sum(w => w.contentLength) * 0.8)
+
+                if (notepadWindows == null)
                 {
-                    _context.API.LogInfo("NotepadSearch", "Skipping first result as it appears to contain the full collection", "");
-                    notepadWindows.RemoveAt(0);
+                    return results;
                 }
-                
+
                 if (string.IsNullOrEmpty(query.Search))
                 {
                     foreach (var window in notepadWindows)

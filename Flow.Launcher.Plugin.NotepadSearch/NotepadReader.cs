@@ -138,19 +138,31 @@ public class NotepadReader
             return true;
         }, IntPtr.Zero);
 
-        // Process each Notepad window
+        // Read each window's content
+        var distinctWindows = new List<NotepadWindow>();
+        var seenEditControls = new HashSet<IntPtr>();
+
         foreach (var notepad in notepadWindows)
         {
-            notepad.Content = GetNotepadContent(notepad.WindowHandle);
+            IntPtr editControl;
+            notepad.Content = GetNotepadContent(notepad.WindowHandle, out editControl);
+
+            // Skip windows with no text control, or whose control we've already read.
+            if (editControl == IntPtr.Zero || !seenEditControls.Add(editControl))
+            {
+                continue;
+            }
+
+            distinctWindows.Add(notepad);
         }
 
-        return notepadWindows;
+        return distinctWindows;
     }
 
     // Get content from a Notepad window
-    private string GetNotepadContent(IntPtr notepadWindow)
+    private string GetNotepadContent(IntPtr notepadWindow, out IntPtr editControl)
     {
-        IntPtr editControl = FindWindowEx(notepadWindow, IntPtr.Zero, "Edit", null);
+        editControl = FindWindowEx(notepadWindow, IntPtr.Zero, "Edit", null);
 
         if (editControl == IntPtr.Zero)
         {
