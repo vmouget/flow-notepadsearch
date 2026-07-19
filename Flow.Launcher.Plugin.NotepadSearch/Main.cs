@@ -87,6 +87,7 @@ namespace Flow.Launcher.Plugin.NotepadSearch
                             Title = window.title,
                             SubTitle = $"Notepad window (PID: {window.processId}), {window.contentLength} characters",
                             IcoPath = IconPath,
+                            CopyText = window.content,
                             Action = _ =>
                             {
                                 try
@@ -150,6 +151,7 @@ namespace Flow.Launcher.Plugin.NotepadSearch
                                 Title = window.title,
                                 SubTitle = subtitle,
                                 IcoPath = IconPath,
+                                CopyText = window.content,
                                 Action = _ =>
                                 {
                                     try
