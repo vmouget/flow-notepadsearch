@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0-windows</TargetFramework>
-    <AssemblyName>Flow.Launcher.Plugin.InTextSearch</AssemblyName>
-    <PackageId>Flow.Launcher.Plugin.InTextSearch</PackageId>
-    <Authors>ValentinM</Authors>
-    <PackageProjectUrl>https://github.com/ValentinM/Flow.Launcher.Plugin.InTextSearch</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/ValentinM/Flow.Launcher.Plugin.InTextSearch</RepositoryUrl>
+    <AssemblyName>Flow.Launcher.Plugin.NotepadSearch</AssemblyName>
+    <PackageId>Flow.Launcher.Plugin.NotepadSearch</PackageId>
+    <Authors>Valentin Mouget</Authors>
+    <PackageProjectUrl>https://github.com/ValentinM/Flow.Launcher.Plugin.NotepadSearch</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ValentinM/Flow.Launcher.Plugin.NotepadSearch</RepositoryUrl>
     <PackageTags>flow-launcher flow-plugin</PackageTags>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

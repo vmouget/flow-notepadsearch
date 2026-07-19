@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using Flow.Launcher.Plugin;
 
-namespace Flow.Launcher.Plugin.InTextSearch
+namespace Flow.Launcher.Plugin.NotepadSearch
 {
-    public class InTextSearch : IPlugin
+    public class NotepadSearch : IPlugin
     {
         private PluginInitContext _context;
         private string IconPath { get; set; }
@@ -40,11 +40,11 @@ namespace Flow.Launcher.Plugin.InTextSearch
                                 bitmap.Save(iconPath, System.Drawing.Imaging.ImageFormat.Png);
                             }
                         }
-                        _context.API.LogInfo("InTextSearch", $"Extracted Notepad icon to {iconPath}", "");
+                        _context.API.LogInfo("NotepadSearch", $"Extracted Notepad icon to {iconPath}", "");
                     }
                     catch (Exception ex)
                     {
-                        _context.API.LogException("InTextSearch", "Error extracting Notepad icon", ex, "");
+                        _context.API.LogException("NotepadSearch", "Error extracting Notepad icon", ex, "");
                         iconPath = "Images/icon.png"; // Fallback to default icon
                     }
                 }
@@ -59,19 +59,19 @@ namespace Flow.Launcher.Plugin.InTextSearch
             string jsonContent = reader.GetAllNotepadContent();
             List<Result> results = new List<Result>();
             
-            _context.API.LogInfo("InTextSearch", $"Raw content length: {jsonContent?.Length ?? 0}", "");
+            _context.API.LogInfo("NotepadSearch", $"Raw content length: {jsonContent?.Length ?? 0}", "");
             
             try
             {
                 var notepadWindows = System.Text.Json.JsonSerializer.Deserialize<List<NotepadWindow>>(jsonContent);
                 
-                _context.API.LogInfo("InTextSearch", $"Deserialized {notepadWindows?.Count ?? 0} Notepad windows", "");
+                _context.API.LogInfo("NotepadSearch", $"Deserialized {notepadWindows?.Count ?? 0} Notepad windows", "");
                 
                 if (notepadWindows.Count > 1 && 
                     notepadWindows[0].contentLength > 0 && 
                     notepadWindows[0].contentLength > notepadWindows.Sum(w => w.contentLength) * 0.8)
                 {
-                    _context.API.LogInfo("InTextSearch", "Skipping first result as it appears to contain the full collection", "");
+                    _context.API.LogInfo("NotepadSearch", "Skipping first result as it appears to contain the full collection", "");
                     notepadWindows.RemoveAt(0);
                 }
                 
@@ -95,7 +95,7 @@ namespace Flow.Launcher.Plugin.InTextSearch
                                 }
                                 catch (Exception ex)
                                 {
-                                    _context.API.LogException("InTextSearch", "Error focusing window", ex, "");
+                                    _context.API.LogException("NotepadSearch", "Error focusing window", ex, "");
                                 }
                                 return true;
                             }
@@ -104,7 +104,7 @@ namespace Flow.Launcher.Plugin.InTextSearch
                 }
                 else
                 {
-                    _context.API.LogInfo("InTextSearch", $"Searching for '{query.Search}' in {notepadWindows.Count} windows", "");
+                    _context.API.LogInfo("NotepadSearch", $"Searching for '{query.Search}' in {notepadWindows.Count} windows", "");
                     
                     foreach (var window in notepadWindows)
                     {
@@ -112,7 +112,7 @@ namespace Flow.Launcher.Plugin.InTextSearch
                             window.title == null)
                             continue;
                             
-                        _context.API.LogInfo("InTextSearch", $"Checking window '{window.title}' (PID: {window.processId})", "");
+                        _context.API.LogInfo("NotepadSearch", $"Checking window '{window.title}' (PID: {window.processId})", "");
                             
                         bool foundInContent = !string.IsNullOrEmpty(window.content) && 
                                             window.content.Contains(query.Search, StringComparison.OrdinalIgnoreCase);
@@ -123,7 +123,7 @@ namespace Flow.Launcher.Plugin.InTextSearch
                             string matchType = foundInContent && foundInTitle ? "title and content" : 
                                             foundInContent ? "content" : "title";
                             
-                            _context.API.LogInfo("InTextSearch", $"Match found in {matchType} of window '{window.title}'", "");
+                            _context.API.LogInfo("NotepadSearch", $"Match found in {matchType} of window '{window.title}'", "");
                             
                             string subtitle;
                             if (foundInContent && !string.IsNullOrEmpty(window.content))
@@ -158,7 +158,7 @@ namespace Flow.Launcher.Plugin.InTextSearch
                                     }
                                     catch (Exception ex)
                                     {
-                                        _context.API.LogException("InTextSearch", "Error focusing window", ex, "");
+                                        _context.API.LogException("NotepadSearch", "Error focusing window", ex, "");
                                     }
                                     return true;
                                 }
@@ -169,7 +169,7 @@ namespace Flow.Launcher.Plugin.InTextSearch
             }
             catch (Exception ex)
             {
-                _context.API.LogException("InTextSearch", "Error parsing Notepad content", ex, "");
+                _context.API.LogException("NotepadSearch", "Error parsing Notepad content", ex, "");
                 
                 results.Add(new Result
                 {
@@ -178,7 +178,7 @@ namespace Flow.Launcher.Plugin.InTextSearch
                 });
             }
             
-            _context.API.LogInfo("InTextSearch", $"Returning {results.Count} results", "");
+            _context.API.LogInfo("NotepadSearch", $"Returning {results.Count} results", "");
             
             return results;
         }
@@ -193,7 +193,7 @@ namespace Flow.Launcher.Plugin.InTextSearch
 
         private void FocusNotepadWindow(string title, int processId)
         {
-            _context.API.LogInfo("InTextSearch", $"Attempting to focus window with title '{title}' and PID {processId}", "");
+            _context.API.LogInfo("NotepadSearch", $"Attempting to focus window with title '{title}' and PID {processId}", "");
             
             EnumWindows((hWnd, lParam) =>
             {
@@ -206,11 +206,11 @@ namespace Flow.Launcher.Plugin.InTextSearch
                     GetWindowText(hWnd, sb, sb.Capacity);
                     string windowTitle = sb.ToString();
                     
-                    _context.API.LogInfo("InTextSearch", $"Found window: '{windowTitle}'", "");
+                    _context.API.LogInfo("NotepadSearch", $"Found window: '{windowTitle}'", "");
                     
                     if (windowTitle.Contains(title))
                     {
-                        _context.API.LogInfo("InTextSearch", $"Found matching window, focusing: '{windowTitle}'", "");
+                        _context.API.LogInfo("NotepadSearch", $"Found matching window, focusing: '{windowTitle}'", "");
                         
                         if (IsIconic(hWnd))
                         {

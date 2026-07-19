@@ -6,10 +6,10 @@ environment:
     DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
 build_script:
-- ps: dotnet publish -c Release -r win-x64 --no-self-contained Flow.Launcher.Plugin.InTextSearch/Flow.Launcher.Plugin.InTextSearch.csproj
+- ps: dotnet publish -c Release -r win-x64 --no-self-contained Flow.Launcher.Plugin.NotepadSearch/Flow.Launcher.Plugin.NotepadSearch.csproj
 
 after_build:
-- ps: Compress-Archive -Path "Flow.Launcher.Plugin.InTextSearch\bin\Release\win-x64\publish\*" -DestinationPath "Flow.Launcher.Plugin.InTextSearch.zip"
+- ps: Compress-Archive -Path "Flow.Launcher.Plugin.NotepadSearch\bin\Release\win-x64\publish\*" -DestinationPath "Flow.Launcher.Plugin.NotepadSearch.zip"
 
 artifacts:
-    - path: 'Flow.Launcher.Plugin.InTextSearch.zip'
+    - path: 'Flow.Launcher.Plugin.NotepadSearch.zip'

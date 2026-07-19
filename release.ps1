@@ -1,2 +1,2 @@
-dotnet publish Flow.Launcher.Plugin.InTextSearch -c Release -r win-x64 --no-self-contained
-Compress-Archive -LiteralPath Flow.Launcher.Plugin.InTextSearch/bin/Release/win-x64/publish -DestinationPath Flow.Launcher.Plugin.InTextSearch/bin/InTextSearch.zip -Force
+dotnet publish Flow.Launcher.Plugin.NotepadSearch -c Release -r win-x64 --no-self-contained
+Compress-Archive -LiteralPath Flow.Launcher.Plugin.NotepadSearch/bin/Release/win-x64/publish -DestinationPath Flow.Launcher.Plugin.NotepadSearch/bin/NotepadSearch.zip -Force

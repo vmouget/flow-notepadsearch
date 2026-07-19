@@ -1,4 +1,4 @@
-dotnet publish Flow.Launcher.Plugin.InTextSearch -c Debug -r win-x64 --no-self-contained
+dotnet publish Flow.Launcher.Plugin.NotepadSearch -c Debug -r win-x64 --no-self-contained
 
 $AppDataFolder = [Environment]::GetFolderPath("ApplicationData")
 $flowLauncherExe = "$env:LOCALAPPDATA\FlowLauncher\Flow.Launcher.exe"
@@ -7,12 +7,12 @@ if (Test-Path $flowLauncherExe) {
     Stop-Process -Name "Flow.Launcher" -Force -ErrorAction SilentlyContinue
     Start-Sleep -Seconds 2
 
-    if (Test-Path "$AppDataFolder\FlowLauncher\Plugins\InTextSearch") {
-        Remove-Item -Recurse -Force "$AppDataFolder\FlowLauncher\Plugins\InTextSearch"
+    if (Test-Path "$AppDataFolder\FlowLauncher\Plugins\NotepadSearch") {
+        Remove-Item -Recurse -Force "$AppDataFolder\FlowLauncher\Plugins\NotepadSearch"
     }
 
-    Copy-Item "Flow.Launcher.Plugin.InTextSearch\bin\Debug\win-x64\publish" "$AppDataFolder\FlowLauncher\Plugins\" -Recurse -Force
-    Rename-Item -Path "$AppDataFolder\FlowLauncher\Plugins\publish" -NewName "InTextSearch"
+    Copy-Item "Flow.Launcher.Plugin.NotepadSearch\bin\Debug\win-x64\publish" "$AppDataFolder\FlowLauncher\Plugins\" -Recurse -Force
+    Rename-Item -Path "$AppDataFolder\FlowLauncher\Plugins\publish" -NewName "NotepadSearch"
 
     Start-Sleep -Seconds 2
     Start-Process $flowLauncherExe

@@ -6,7 +6,7 @@
     "Author": "Valentin Mouget",
     "Version": "1.0.0",
     "Language": "csharp",
-    "Website": "https://github.com/snapfire/Flow.Launcher.Plugin.NotepadSearch",
+    "Website": "https://github.com/ValentinM/Flow.Launcher.Plugin.NotepadSearch",
     "IcoPath": "Images/icon.png",
     "ExecuteFileName": "Flow.Launcher.Plugin.NotepadSearch.dll"
 }
